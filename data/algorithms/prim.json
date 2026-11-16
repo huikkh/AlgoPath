@@ -1,0 +1,150 @@
+{
+  "id": "prim",
+  "introduction": "Prim 演算法用來在連通、無向、加權圖中尋找最小生成樹（Minimum Spanning Tree, MST）。最小生成樹會連接所有頂點、不包含環，並使選取邊的總權重最小。對含有 V 個頂點的生成樹，必須恰好選取 V−1 條邊。",
+  "coreConcept": "Prim 從任意一個頂點開始，維護一個已加入生成樹的頂點集合。每次只考慮「一端在集合內、另一端在集合外」的邊，選出其中權重最小的一條，將新頂點與這條邊加入生成樹。重點不是全圖最小的邊，而是能把目前樹擴張出去的最小邊。",
+  "steps": [
+    {
+      "title": "選擇起始節點",
+      "description": "任意選一個節點作為生成樹起點，將它標記為已加入集合。"
+    },
+    {
+      "title": "尋找跨集合的邊",
+      "description": "在所有連接「樹內節點」與「樹外節點」的邊中，找出權重最小者。"
+    },
+    {
+      "title": "擴張生成樹",
+      "description": "將選中的邊與新節點加入生成樹。若新節點已在樹內，就不加入以免形成環。"
+    },
+    {
+      "title": "直到連接所有節點",
+      "description": "重複尋找與加入，直到所有頂點都進入生成樹；連通圖中最後會選到 V−1 條邊。"
+    }
+  ],
+  "example": {
+    "description": "從 A 開始，在這張六個節點的無向加權圖中尋找最小生成樹。每一步都只考慮一端位於目前樹內、另一端仍在樹外的候選邊。",
+    "graph": {
+      "directed": false,
+      "nodes": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F"
+      ],
+      "edges": [
+        {
+          "from": "A",
+          "to": "B",
+          "weight": 4
+        },
+        {
+          "from": "A",
+          "to": "C",
+          "weight": 2
+        },
+        {
+          "from": "B",
+          "to": "C",
+          "weight": 1
+        },
+        {
+          "from": "B",
+          "to": "D",
+          "weight": 5
+        },
+        {
+          "from": "C",
+          "to": "D",
+          "weight": 8
+        },
+        {
+          "from": "C",
+          "to": "E",
+          "weight": 10
+        },
+        {
+          "from": "D",
+          "to": "E",
+          "weight": 2
+        },
+        {
+          "from": "D",
+          "to": "F",
+          "weight": 6
+        },
+        {
+          "from": "E",
+          "to": "F",
+          "weight": 3
+        }
+      ]
+    },
+    "walkthrough": [
+      {
+        "step": 1,
+        "title": "從 A 建立生成樹",
+        "description": "目前只有 A 在樹內，候選邊為 A-B（4）與 A-C（2），選擇 A-C。",
+        "state": "已加入：A、C　｜　選取邊：A-C（2）"
+      },
+      {
+        "step": 2,
+        "title": "加入 B",
+        "description": "從目前樹內集合 {A,C} 向外連接的最小邊是 C-B（1），加入 B。",
+        "state": "已加入：A、B、C　｜　總權重：2 + 1 = 3"
+      },
+      {
+        "step": 3,
+        "title": "加入 D",
+        "description": "連接樹內與樹外的候選邊中，B-D（5）小於 C-D（8）與 C-E（10），因此選擇 B-D。",
+        "state": "已加入：A、B、C、D　｜　總權重：3 + 5 = 8"
+      },
+      {
+        "step": 4,
+        "title": "加入 E",
+        "description": "目前連接到樹外的最小邊為 D-E（2），因此加入 E。",
+        "state": "已加入：A、B、C、D、E　｜　總權重：8 + 2 = 10"
+      },
+      {
+        "step": 5,
+        "title": "加入 F，完成生成樹",
+        "description": "選擇 E-F（3），所有六個節點都已連接，總共選取 V−1 = 5 條邊。",
+        "state": "選取邊：A-C、C-B、B-D、D-E、E-F　｜　總權重：13"
+      }
+    ],
+    "result": "最小生成樹包含 A-C（2）、C-B（1）、B-D（5）、D-E（2）、E-F（3），總權重為 13。"
+  },
+  "pseudocode": "PRIM(graph, start):\n    mark all vertices as not in tree\n    key[v] = infinity for every vertex v\n    key[start] = 0\n    parent[start] = NIL\n    priority_queue.push((0, start))\n\n    while priority_queue is not empty:\n        (cost, u) = priority_queue.pop_min()\n        if u is already in tree:\n            continue\n        add u to tree\n\n        for each edge (u, v, weight):\n            if v is not in tree and weight < key[v]:\n                key[v] = weight\n                parent[v] = u\n                priority_queue.push((weight, v))\n\n    return parent",
+  "complexity": {
+    "time": "O((V + E) log V)",
+    "space": "O(V + E)",
+    "notes": "此處使用 adjacency list 與 binary min-heap，並在取出時略過已加入生成樹的節點。時間複雜度為 O((V + E) log V)；額外資料結構包含 key、parent、visited 與優先佇列。若使用 adjacency matrix 與線性搜尋，常見時間複雜度則為 O(V²)。"
+  },
+  "pros": [
+    "直接從一棵逐步成長的樹出發，概念容易視覺化。",
+    "使用優先佇列時，適合處理稀疏圖。",
+    "只需維護目前樹與其外部節點之間的候選邊。"
+  ],
+  "cons": [
+    "需要無向、加權圖；若圖不連通，只能得到起始連通分量的生成樹。",
+    "實作時需要正確維護候選邊與已加入集合。",
+    "不同資料結構會影響實際複雜度。"
+  ],
+  "applications": [
+    "以最低總成本連接所有地點的道路或電纜配置。",
+    "網路、電力或通訊基礎設施的連接成本規劃。",
+    "需要最小化整體連接成本的群集與網路設計問題。"
+  ],
+  "comparisons": [
+    {
+      "algorithmId": "kruskal",
+      "description": "Prim 從一個起點擴張一棵樹；Kruskal 則將所有邊排序後，從全圖角度逐條加入不會形成環的邊。兩者都可求最小生成森林／樹。"
+    }
+  ],
+  "references": [
+    {
+      "title": "CP-Algorithms：Minimum Spanning Tree — Prim's Algorithm",
+      "url": "https://cp-algorithms.com/graph/mst_prim.html"
+    }
+  ]
+}

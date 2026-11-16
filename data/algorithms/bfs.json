@@ -1,0 +1,133 @@
+{
+  "id": "bfs",
+  "introduction": "廣度優先搜尋（Breadth-First Search，BFS）是一種走訪圖形或樹狀結構的方法。給定起點後，BFS 會先拜訪距離起點一條邊的節點，再拜訪距離兩條邊的節點，依此類推。若圖形是無權重圖，BFS 找到的路徑會具有最少的邊數。",
+  "coreConcept": "BFS 的核心是「先進先出」（First In, First Out）。它使用佇列（Queue）保存已發現、但尚未展開的節點。每次取出佇列最前方的節點，再把尚未拜訪的鄰居依序加入佇列。因為較早發現的節點會先被處理，所以搜尋會自然地由近到遠擴展。",
+  "steps": [
+    {
+      "title": "初始化起點",
+      "description": "建立空佇列與拜訪紀錄，將起點標記為已發現並放入佇列。"
+    },
+    {
+      "title": "取出隊首節點",
+      "description": "從佇列前端取出一個節點，代表接下來要探索它的所有鄰居。"
+    },
+    {
+      "title": "檢查相鄰節點",
+      "description": "逐一檢查鄰居；若尚未被發現，就標記為已發現、記錄前驅（需要還原路徑時），並加入佇列。"
+    },
+    {
+      "title": "持續探索",
+      "description": "重複取出節點與加入新鄰居，直到佇列清空，或已找到指定目標。"
+    }
+  ],
+  "example": {
+    "description": "從節點 A 出發，依照鄰接節點的字母順序探索這張無向、無權重圖。BFS 會先處理 A 的鄰居 B、C，再處理下一層的 D、E、F。",
+    "graph": {
+      "directed": false,
+      "nodes": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F"
+      ],
+      "edges": [
+        {
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "from": "A",
+          "to": "C"
+        },
+        {
+          "from": "B",
+          "to": "D"
+        },
+        {
+          "from": "B",
+          "to": "E"
+        },
+        {
+          "from": "C",
+          "to": "F"
+        },
+        {
+          "from": "E",
+          "to": "F"
+        }
+      ]
+    },
+    "walkthrough": [
+      {
+        "step": 1,
+        "title": "從 A 開始",
+        "description": "將 A 標記為已發現，並放入佇列。",
+        "state": "佇列：[A]　｜　走訪順序：尚未完成"
+      },
+      {
+        "step": 2,
+        "title": "展開 A",
+        "description": "取出 A，發現尚未拜訪的鄰居 B、C，依序加入佇列。",
+        "state": "佇列：[B, C]　｜　走訪順序：A"
+      },
+      {
+        "step": 3,
+        "title": "展開 B",
+        "description": "取出 B，發現 D、E，將它們放到佇列尾端。",
+        "state": "佇列：[C, D, E]　｜　走訪順序：A → B"
+      },
+      {
+        "step": 4,
+        "title": "展開 C",
+        "description": "取出 C，發現 F；F 尚未出現，因此加入佇列。",
+        "state": "佇列：[D, E, F]　｜　走訪順序：A → B → C"
+      },
+      {
+        "step": 5,
+        "title": "完成剩餘節點",
+        "description": "依序處理 D、E、F。E 發現 F 已經被標記，因此不會重複加入。",
+        "state": "佇列清空　｜　走訪順序：A → B → C → D → E → F"
+      }
+    ],
+    "result": "BFS 的走訪順序為 A、B、C、D、E、F。若將每條邊視為成本相同，從 A 到 F 的最少邊數路徑為 A → C → F，共 2 條邊。"
+  },
+  "pseudocode": "BFS(graph, start):\n    create empty queue Q\n    mark start as visited\n    enqueue(Q, start)\n\n    while Q is not empty:\n        u = dequeue(Q)\n        for each neighbor v of u:\n            if v is not visited:\n                mark v as visited\n                parent[v] = u\n                enqueue(Q, v)",
+  "complexity": {
+    "time": "O(V + E)",
+    "space": "O(V)",
+    "notes": "使用 adjacency list（鄰接串列）時，每個頂點最多入隊一次，每條邊最多被檢查常數次，因此時間為 O(V + E)。此處空間指拜訪紀錄、佇列與前驅等額外空間；若連同圖形本身計算，圖形儲存需要 O(V + E)。"
+  },
+  "pros": [
+    "在無權重圖中可找到邊數最少的路徑。",
+    "流程直觀，容易用佇列實作。",
+    "可用於計算節點層級、連通區塊與最短步數。"
+  ],
+  "cons": [
+    "無法直接處理不同邊權重所代表的不同成本。",
+    "若圖形很寬，佇列可能同時保存大量節點。",
+    "若目標位於很深的位置，可能需要探索許多其他節點。"
+  ],
+  "applications": [
+    "無權重圖的最短路徑與最少轉乘／步數問題。",
+    "社群網路中的關係層級與好友距離。",
+    "迷宮或狀態空間中，每一步成本相同的最少步數搜尋。"
+  ],
+  "comparisons": [
+    {
+      "algorithmId": "dfs",
+      "description": "BFS 使用佇列並由近到遠探索；DFS 使用堆疊或遞迴，會先沿一條路徑深入。若要找無權重圖的最少邊數路徑，通常選 BFS。"
+    },
+    {
+      "algorithmId": "dijkstra",
+      "description": "當邊具有非負且不相同的權重時，BFS 的最少邊數不一定是最低總成本，應改用 Dijkstra 等加權最短路徑演算法。"
+    }
+  ],
+  "references": [
+    {
+      "title": "CP-Algorithms：Breadth First Search",
+      "url": "https://cp-algorithms.com/graph/breadth-first-search.html"
+    }
+  ]
+}

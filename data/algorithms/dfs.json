@@ -1,0 +1,129 @@
+{
+  "id": "dfs",
+  "introduction": "深度優先搜尋（Depth-First Search，DFS）是一種系統性走訪圖形的方法。從起點出發後，DFS 會先選擇一個尚未拜訪的鄰居繼續深入；當目前節點沒有可繼續探索的鄰居時，才回到上一個節點，嘗試其他分支。",
+  "coreConcept": "DFS 的核心是「深入探索，再回溯」（Backtracking）。實作時可以使用遞迴呼叫堆疊，或自行維護 stack。每個節點第一次被拜訪時就要立即標記，避免遇到環時重複進入。鄰居的選擇順序會影響實際走訪順序，但不影響 DFS 的基本性質。",
+  "steps": [
+    {
+      "title": "拜訪目前節點",
+      "description": "將目前節點標記為已拜訪，必要時記錄進入時間或父節點。"
+    },
+    {
+      "title": "尋找未拜訪鄰居",
+      "description": "依照指定的鄰接順序，尋找一個尚未拜訪的相鄰節點。"
+    },
+    {
+      "title": "繼續深入",
+      "description": "若找到未拜訪鄰居，就從該節點繼續執行 DFS。"
+    },
+    {
+      "title": "回溯",
+      "description": "若目前節點沒有未拜訪鄰居，便返回上一層，繼續檢查其他分支。所有可到達節點完成後，搜尋結束。"
+    }
+  ],
+  "example": {
+    "description": "使用與 BFS 相同的無向圖，從 A 出發，並按照字母順序選擇下一個鄰居。DFS 會先沿 A → B → D 前進，回溯後再走向 E、F、C。",
+    "graph": {
+      "directed": false,
+      "nodes": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F"
+      ],
+      "edges": [
+        {
+          "from": "A",
+          "to": "B"
+        },
+        {
+          "from": "A",
+          "to": "C"
+        },
+        {
+          "from": "B",
+          "to": "D"
+        },
+        {
+          "from": "B",
+          "to": "E"
+        },
+        {
+          "from": "C",
+          "to": "F"
+        },
+        {
+          "from": "E",
+          "to": "F"
+        }
+      ]
+    },
+    "walkthrough": [
+      {
+        "step": 1,
+        "title": "從 A 深入 B",
+        "description": "拜訪 A 後，依字母順序先選 B，沿著第一條分支往下。",
+        "state": "遞迴路徑：A → B"
+      },
+      {
+        "step": 2,
+        "title": "繼續走向 D",
+        "description": "B 的未拜訪鄰居中，D 排在 E 前面，因此先拜訪 D。D 沒有其他未拜訪鄰居。",
+        "state": "遞迴路徑：A → B → D"
+      },
+      {
+        "step": 3,
+        "title": "回溯至 B，再走 E",
+        "description": "D 無法繼續，回到 B，接著拜訪尚未探索的 E。",
+        "state": "遞迴路徑：A → B → E"
+      },
+      {
+        "step": 4,
+        "title": "從 E 前往 F",
+        "description": "E 的鄰居 F 尚未拜訪，因此繼續深入 F。",
+        "state": "遞迴路徑：A → B → E → F"
+      },
+      {
+        "step": 5,
+        "title": "回溯並完成 C",
+        "description": "F 可連到 C，因此先拜訪 C；完成後逐層回溯，所有可到達節點都已探索。",
+        "state": "走訪順序：A → B → D → E → F → C"
+      }
+    ],
+    "result": "依照本例的鄰接順序，DFS 走訪順序為 A、B、D、E、F、C。若改變鄰居順序，走訪順序可能不同。"
+  },
+  "pseudocode": "DFS(graph, u):\n    mark u as visited\n    for each neighbor v of u:\n        if v is not visited:\n            parent[v] = u\n            DFS(graph, v)\n\n# For a disconnected graph, start DFS\n# from each vertex that is still unvisited.",
+  "complexity": {
+    "time": "O(V + E)",
+    "space": "O(V)",
+    "notes": "使用 adjacency list 時，每個頂點拜訪一次，每條邊最多檢查常數次，時間為 O(V + E)。額外空間主要來自 visited、parent 與最深可達 V 層的遞迴堆疊；若使用迭代版，stack 最多也可能保存 O(V) 個節點。"
+  },
+  "pros": [
+    "可以用簡潔的遞迴方式實作。",
+    "適合探索連通區塊、環路、拓樸排序及圖形結構。",
+    "相較於 BFS，不一定需要同時保存整層節點。"
+  ],
+  "cons": [
+    "一般圖形中的 DFS 路徑不保證是最短路徑。",
+    "遞迴版本在極深圖形上可能造成呼叫堆疊過深。",
+    "結果會受鄰接節點排序影響。"
+  ],
+  "applications": [
+    "尋找連通分量與判斷圖形是否連通。",
+    "偵測環路、拓樸排序與強連通分量等圖論問題。",
+    "迷宮探索、回溯搜尋與狀態空間遍歷。"
+  ],
+  "comparisons": [
+    {
+      "algorithmId": "bfs",
+      "description": "DFS 會先深入一條分支再回溯，BFS 則由近到遠逐層探索。若目標是無權重圖中的最少邊數路徑，BFS 通常較合適。"
+    }
+  ],
+  "references": [
+    {
+      "title": "CP-Algorithms：Depth First Search",
+      "url": "https://cp-algorithms.com/graph/depth-first-search.html"
+    }
+  ]
+}

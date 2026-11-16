@@ -1,0 +1,143 @@
+{
+  "id": "bellman-ford",
+  "introduction": "Bellman-Ford 演算法用來計算帶權重圖中，單一來源點到其他節點的最短距離。與 Dijkstra 不同，Bellman-Ford 可以處理負權重邊；此外，透過額外的一輪檢查，能偵測從起點可到達的負權重環。",
+  "coreConcept": "Bellman-Ford 的核心是反覆放鬆（Relaxation）所有邊。若目前已知到 u 的距離，加上邊 (u,v) 的權重後，比已知到 v 的距離更短，就更新 dist[v]。若最短路徑存在且沒有負權重環，簡單路徑最多包含 V−1 條邊，因此最多執行 V−1 輪即可得到結果。第 V 輪仍有可更新的距離，代表存在從起點可到達的負權重環。",
+  "steps": [
+    {
+      "title": "初始化距離",
+      "description": "將起點距離設為 0，其他節點設為無限大。"
+    },
+    {
+      "title": "重複放鬆所有邊",
+      "description": "最多執行 V−1 輪；每輪逐一檢查所有邊，若能讓終點距離變短，就更新距離與前驅。"
+    },
+    {
+      "title": "提早停止（可選）",
+      "description": "若某一輪完全沒有距離更新，代表後續也不會改善，可以提前結束。"
+    },
+    {
+      "title": "檢查負權重環",
+      "description": "再檢查一次所有邊；若仍存在可改善的距離，表示有從起點可到達的負權重環。"
+    }
+  ],
+  "example": {
+    "description": "這是一張有向加權圖，起點為 S。邊 S→A 的權重為 4，A→B 為 -2。由於有負權重邊，Dijkstra 不適用；Bellman-Ford 透過多輪放鬆逐步改善距離。",
+    "graph": {
+      "directed": true,
+      "nodes": [
+        "S",
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "edges": [
+        {
+          "from": "S",
+          "to": "A",
+          "weight": 4
+        },
+        {
+          "from": "S",
+          "to": "B",
+          "weight": 5
+        },
+        {
+          "from": "B",
+          "to": "C",
+          "weight": 6
+        },
+        {
+          "from": "B",
+          "to": "D",
+          "weight": 9
+        },
+        {
+          "from": "A",
+          "to": "B",
+          "weight": -2
+        },
+        {
+          "from": "A",
+          "to": "C",
+          "weight": 10
+        },
+        {
+          "from": "C",
+          "to": "D",
+          "weight": 2
+        }
+      ]
+    },
+    "walkthrough": [
+      {
+        "step": 1,
+        "title": "初始化",
+        "description": "起點 S 的距離為 0，其餘節點為無限大。",
+        "state": "S=0、A=∞、B=∞、C=∞、D=∞"
+      },
+      {
+        "step": 2,
+        "title": "第一輪放鬆",
+        "description": "依序檢查所有邊。先得到 A=4、B=5；之後 A→B 將 B 改善為 2，A→C 讓 C=10，C→D 讓 D=12。",
+        "state": "第一輪後：S=0、A=4、B=2、C=10、D=12"
+      },
+      {
+        "step": 3,
+        "title": "第二輪放鬆",
+        "description": "再次檢查所有邊，B→C 將 C 從 10 改善為 8；B→D 先提供 11，接著 C→D 將 D 改善為 10。",
+        "state": "第二輪後：S=0、A=4、B=2、C=8、D=10"
+      },
+      {
+        "step": 4,
+        "title": "第三輪確認",
+        "description": "再檢查所有邊，沒有任何距離可以繼續改善，因此可提前停止。",
+        "state": "距離維持：S=0、A=4、B=2、C=8、D=10"
+      },
+      {
+        "step": 5,
+        "title": "負權重環檢查",
+        "description": "再檢查一次所有邊，仍無法找到可改善的距離，因此此範例不存在從 S 可到達的負權重環。",
+        "state": "最短距離：S=0、A=4、B=2、C=8、D=10"
+      }
+    ],
+    "result": "從 S 到 D 的最短路徑為 S → A → B → C → D，總權重為 4 + (−2) + 6 + 2 = 10。範例沒有可由 S 到達的負權重環。"
+  },
+  "pseudocode": "BELLMAN_FORD(vertices, edges, start):\n    for each vertex v:\n        dist[v] = infinity\n    dist[start] = 0\n\n    repeat |V| - 1 times:\n        changed = false\n        for each edge (u, v, weight):\n            if dist[u] is not infinity and\n               dist[u] + weight < dist[v]:\n                dist[v] = dist[u] + weight\n                parent[v] = u\n                changed = true\n        if changed == false:\n            break\n\n    for each edge (u, v, weight):\n        if dist[u] is not infinity and\n           dist[u] + weight < dist[v]:\n            report reachable negative cycle\n\n    return dist, parent",
+  "complexity": {
+    "time": "O(V × E)",
+    "space": "O(V)",
+    "notes": "最多執行 V−1 輪，每輪檢查 E 條邊，另有一次負環檢查，因此時間複雜度為 O(VE)。額外空間用於距離與前驅陣列，為 O(V)；若將輸入邊集合也計入儲存，則需 O(V + E)。"
+  },
+  "pros": [
+    "可處理正權重、零權重與負權重邊。",
+    "能偵測從來源點可到達的負權重環。",
+    "概念直接，適合說明最短路徑的放鬆過程。"
+  ],
+  "cons": [
+    "通常比使用優先佇列的 Dijkstra 慢。",
+    "若存在可到達的負權重環，相關最短距離沒有有限解。",
+    "對大型稠密圖，O(VE) 的成本可能偏高。"
+  ],
+  "applications": [
+    "含有折扣、回饋或收益等負成本的路徑模型。",
+    "金融匯率套利模型中的負環偵測概念。",
+    "需要同時處理負權重與最短路徑的圖論問題。"
+  ],
+  "comparisons": [
+    {
+      "algorithmId": "dijkstra",
+      "description": "Dijkstra 使用貪婪選擇，適合非負權重且通常較有效率；Bellman-Ford 以多輪放鬆換取處理負權重與偵測負環的能力。"
+    },
+    {
+      "algorithmId": "floyd-warshall",
+      "description": "Bellman-Ford 求單一起點到各點；Floyd-Warshall 求所有點對之間的最短距離，後者時間為 O(V³)、空間為 O(V²)。"
+    }
+  ],
+  "references": [
+    {
+      "title": "CP-Algorithms：Bellman-Ford Algorithm",
+      "url": "https://cp-algorithms.com/graph/bellman_ford.html"
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "id": "dijkstra",
+  "introduction": "Dijkstra 演算法用來求解帶有非負邊權重的圖中，單一來源點（Single-Source）到其他可到達節點的最短距離。它從起點開始，逐步確定目前距離最小的未確定節點，並利用該節點更新鄰居的距離。",
+  "coreConcept": "Dijkstra 採用貪婪法（Greedy Strategy）。每次從候選節點中取出暫定距離最小者，將它視為已確定最短距離，再嘗試透過它改善鄰居的距離。這個「一旦確定就不必回頭」的性質依賴所有邊權重皆為非負；若存在負權重邊，已確定的距離可能再次被縮短，演算法便不再可靠。",
+  "steps": [
+    {
+      "title": "初始化距離",
+      "description": "將起點距離設為 0，其他節點設為無限大。建立最小優先佇列，先放入起點。"
+    },
+    {
+      "title": "取出最近節點",
+      "description": "從最小優先佇列取出目前暫定距離最小的節點；若該項目已過期，則略過。"
+    },
+    {
+      "title": "放鬆相鄰邊",
+      "description": "對每個鄰居 v，檢查 dist[u] + w(u,v) 是否小於 dist[v]；若較小，就更新距離並記錄前驅。"
+    },
+    {
+      "title": "持續直到完成",
+      "description": "重複取出節點與放鬆邊，直到優先佇列清空。最後的 dist 即為從起點出發的最短距離。"
+    }
+  ],
+  "example": {
+    "description": "下圖為非負權重的無向圖，從 A 出發。每次選擇暫定距離最小的節點，並用它檢查相鄰邊。圖中的數字代表邊權重。",
+    "graph": {
+      "directed": false,
+      "nodes": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F"
+      ],
+      "edges": [
+        {
+          "from": "A",
+          "to": "B",
+          "weight": 4
+        },
+        {
+          "from": "A",
+          "to": "C",
+          "weight": 2
+        },
+        {
+          "from": "B",
+          "to": "C",
+          "weight": 1
+        },
+        {
+          "from": "B",
+          "to": "D",
+          "weight": 5
+        },
+        {
+          "from": "C",
+          "to": "D",
+          "weight": 8
+        },
+        {
+          "from": "C",
+          "to": "E",
+          "weight": 10
+        },
+        {
+          "from": "D",
+          "to": "E",
+          "weight": 2
+        },
+        {
+          "from": "D",
+          "to": "F",
+          "weight": 6
+        },
+        {
+          "from": "E",
+          "to": "F",
+          "weight": 3
+        }
+      ]
+    },
+    "walkthrough": [
+      {
+        "step": 1,
+        "title": "確定起點 A",
+        "description": "dist[A] = 0。從 A 出發後，B 的暫定距離為 4，C 的暫定距離為 2。",
+        "state": "目前距離：A=0、B=4、C=2、D=∞、E=∞、F=∞"
+      },
+      {
+        "step": 2,
+        "title": "選擇 C（距離 2）",
+        "description": "C 是目前距離最小的未確定節點。經由 C 到 B 的距離為 3，比原本的 4 更短；到 D、E 的距離分別更新為 10、12。",
+        "state": "目前距離：A=0、B=3、C=2、D=10、E=12、F=∞"
+      },
+      {
+        "step": 3,
+        "title": "選擇 B（距離 3）",
+        "description": "經由 B 到 D 的距離為 3 + 5 = 8，小於原本的 10，因此將 D 更新為 8。",
+        "state": "目前距離：A=0、B=3、C=2、D=8、E=12、F=∞"
+      },
+      {
+        "step": 4,
+        "title": "選擇 D（距離 8）",
+        "description": "經由 D 到 E 的距離為 10，比原本的 12 更短；到 F 的暫定距離為 14。",
+        "state": "目前距離：A=0、B=3、C=2、D=8、E=10、F=14"
+      },
+      {
+        "step": 5,
+        "title": "選擇 E（距離 10）",
+        "description": "經由 E 到 F 的距離為 13，小於原本的 14，因此更新 F。",
+        "state": "目前距離：A=0、B=3、C=2、D=8、E=10、F=13"
+      },
+      {
+        "step": 6,
+        "title": "完成最短距離",
+        "description": "最後取出 F，沒有更短的路徑可以更新。所有節點的最短距離均已確定。",
+        "state": "最短距離：A=0、B=3、C=2、D=8、E=10、F=13"
+      }
+    ],
+    "result": "從 A 出發到 F 的最短路徑為 A → C → B → D → E → F，總權重為 2 + 1 + 5 + 2 + 3 = 13。各節點最短距離為 A:0、B:3、C:2、D:8、E:10、F:13。"
+  },
+  "pseudocode": "DIJKSTRA(graph, start):\n    for each vertex v:\n        dist[v] = infinity\n        parent[v] = NIL\n    dist[start] = 0\n\n    priority_queue.push((0, start))\n    while priority_queue is not empty:\n        (d, u) = priority_queue.pop_min()\n        if d != dist[u]:\n            continue\n\n        for each edge (u, v, weight):\n            candidate = dist[u] + weight\n            if candidate < dist[v]:\n                dist[v] = candidate\n                parent[v] = u\n                priority_queue.push((candidate, v))\n\n    return dist, parent",
+  "complexity": {
+    "time": "O((V + E) log V)",
+    "space": "O(V + E)",
+    "notes": "此處採 adjacency list 與 binary min-heap，並使用 lazy deletion（舊的佇列項目在取出時檢查是否過期）。常見寫法的時間複雜度可寫為 O((V + E) log V)。額外空間可能包含優先佇列中的多筆候選項目，最壞可達 O(E)；圖形本身另需 O(V + E) 儲存空間。"
+  },
+  "pros": [
+    "對非負權重圖能有效求出單一起點到所有節點的最短距離。",
+    "搭配優先佇列時，對稀疏圖通常具有良好效率。",
+    "可透過 parent 陣列還原實際最短路徑。"
+  ],
+  "cons": [
+    "不能直接處理負權重邊。",
+    "若需要所有節點兩兩之間的最短路徑，重複執行會有額外成本。",
+    "若圖形很稠密，使用 binary heap 未必比簡單陣列實作更合適。"
+  ],
+  "applications": [
+    "道路導航與交通路網中的最低成本路徑（權重非負）。",
+    "網路路由與通訊成本計算。",
+    "遊戲地圖中移動成本皆非負時的路徑規劃。"
+  ],
+  "comparisons": [
+    {
+      "algorithmId": "bellman-ford",
+      "description": "Dijkstra 速度通常較快，但要求邊權重非負；Bellman-Ford 可處理負權重，並能偵測可由起點到達的負權重環。"
+    },
+    {
+      "algorithmId": "bfs",
+      "description": "BFS 適合每條邊成本相同的無權重圖；若邊的成本不同，單純最少邊數不等於最小總權重，需考慮 Dijkstra。"
+    },
+    {
+      "algorithmId": "floyd-warshall",
+      "description": "Dijkstra 解單一起點到其他節點；Floyd-Warshall 一次計算所有節點對之間的最短距離，適用規模與情境不同。"
+    }
+  ],
+  "references": [
+    {
+      "title": "CP-Algorithms：Dijkstra Algorithm",
+      "url": "https://cp-algorithms.com/graph/dijkstra.html"
+    }
+  ]
+}

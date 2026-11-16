@@ -1,0 +1,114 @@
+[
+  {
+    "id": "bfs",
+    "title": "廣度優先搜尋（BFS）",
+    "englishTitle": "Breadth-First Search",
+    "category": "graph-traversal",
+    "categoryName": "圖形搜尋",
+    "summary": "從起點一層一層向外探索，適合尋找無權重圖中的最少邊數路徑。",
+    "difficulty": "初級",
+    "tags": [
+      "圖論",
+      "佇列 Queue",
+      "搜尋",
+      "最短路徑"
+    ],
+    "file": "./data/algorithms/bfs.json"
+  },
+  {
+    "id": "dfs",
+    "title": "深度優先搜尋（DFS）",
+    "englishTitle": "Depth-First Search",
+    "category": "graph-traversal",
+    "categoryName": "圖形搜尋",
+    "summary": "沿著一條路徑盡可能深入，無法前進時再回溯，可用於連通性與環路分析。",
+    "difficulty": "初級",
+    "tags": [
+      "圖論",
+      "堆疊 Stack",
+      "遞迴",
+      "回溯"
+    ],
+    "file": "./data/algorithms/dfs.json"
+  },
+  {
+    "id": "dijkstra",
+    "title": "Dijkstra 演算法",
+    "englishTitle": "Dijkstra's Algorithm",
+    "category": "shortest-path",
+    "categoryName": "最短路徑",
+    "summary": "利用反覆選取目前距離最近的節點，求出單一起點到其他節點的最短距離。",
+    "difficulty": "中級",
+    "tags": [
+      "圖論",
+      "最短路徑",
+      "Greedy",
+      "非負權重"
+    ],
+    "file": "./data/algorithms/dijkstra.json"
+  },
+  {
+    "id": "bellman-ford",
+    "title": "Bellman-Ford 演算法",
+    "englishTitle": "Bellman-Ford Algorithm",
+    "category": "shortest-path",
+    "categoryName": "最短路徑",
+    "summary": "反覆放鬆所有邊來計算單一起點最短路徑，並能偵測可到達的負權重環。",
+    "difficulty": "中級",
+    "tags": [
+      "圖論",
+      "最短路徑",
+      "負權重",
+      "Relaxation"
+    ],
+    "file": "./data/algorithms/bellman-ford.json"
+  },
+  {
+    "id": "floyd-warshall",
+    "title": "Floyd-Warshall 演算法",
+    "englishTitle": "Floyd-Warshall Algorithm",
+    "category": "shortest-path",
+    "categoryName": "最短路徑",
+    "summary": "逐一把節點作為中繼點，計算圖中每一對節點之間的最短距離。",
+    "difficulty": "中級",
+    "tags": [
+      "圖論",
+      "全點對最短路徑",
+      "動態規劃",
+      "矩陣"
+    ],
+    "file": "./data/algorithms/floyd-warshall.json"
+  },
+  {
+    "id": "prim",
+    "title": "Prim 演算法",
+    "englishTitle": "Prim's Algorithm",
+    "category": "minimum-spanning-tree",
+    "categoryName": "最小生成樹",
+    "summary": "從任一節點開始，每次加入連接目前生成樹與外部節點的最小權重邊。",
+    "difficulty": "中級",
+    "tags": [
+      "圖論",
+      "最小生成樹",
+      "Greedy",
+      "Priority Queue"
+    ],
+    "file": "./data/algorithms/prim.json"
+  },
+  {
+    "id": "kruskal",
+    "title": "Kruskal 演算法",
+    "englishTitle": "Kruskal's Algorithm",
+    "category": "minimum-spanning-tree",
+    "categoryName": "最小生成樹",
+    "summary": "將所有邊依權重排序，依序選取不會形成環的邊，直到連通所有節點。",
+    "difficulty": "中級",
+    "tags": [
+      "圖論",
+      "最小生成樹",
+      "Greedy",
+      "Union-Find"
+    ],
+    "file": "./data/algorithms/kruskal.json"
+  }
+]

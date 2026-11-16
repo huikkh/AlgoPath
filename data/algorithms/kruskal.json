@@ -1,0 +1,154 @@
+{
+  "id": "kruskal",
+  "introduction": "Kruskal 演算法是一種尋找最小生成樹的貪婪演算法。它先將圖中所有邊依權重由小到大排序，再逐一考慮這些邊；若加入某條邊不會形成環，就將它加入生成樹。當已選取 V−1 條邊時，便完成最小生成樹。",
+  "coreConcept": "Kruskal 的核心是「先選便宜的邊，但不能形成環」。為了有效判斷兩個端點是否已經連通，通常使用並查集（Disjoint Set Union, DSU；也稱 Union-Find）。若兩端點屬於不同集合，就接受這條邊並合併集合；若已在同一集合，加入後會形成環，因此跳過。",
+  "steps": [
+    {
+      "title": "排序所有邊",
+      "description": "將所有邊依權重由小到大排列。"
+    },
+    {
+      "title": "初始化並查集",
+      "description": "一開始每個頂點各自屬於一個集合，代表目前彼此尚未連通。"
+    },
+    {
+      "title": "依序檢查邊",
+      "description": "取出目前權重最小且尚未處理的邊，利用 Find 判斷兩端點所屬集合。"
+    },
+    {
+      "title": "接受或略過",
+      "description": "若兩端點屬於不同集合，加入此邊並透過 Union 合併；若屬於同一集合，略過以避免形成環。"
+    },
+    {
+      "title": "完成生成樹",
+      "description": "選取 V−1 條邊後停止。若所有邊處理完仍不足 V−1 條，代表原圖不連通，結果為最小生成森林。"
+    }
+  ],
+  "example": {
+    "description": "使用與 Prim 相同的無向加權圖。Kruskal 不指定起點，而是把全圖的邊排序後，依序決定要不要加入生成樹。",
+    "graph": {
+      "directed": false,
+      "nodes": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F"
+      ],
+      "edges": [
+        {
+          "from": "A",
+          "to": "B",
+          "weight": 4
+        },
+        {
+          "from": "A",
+          "to": "C",
+          "weight": 2
+        },
+        {
+          "from": "B",
+          "to": "C",
+          "weight": 1
+        },
+        {
+          "from": "B",
+          "to": "D",
+          "weight": 5
+        },
+        {
+          "from": "C",
+          "to": "D",
+          "weight": 8
+        },
+        {
+          "from": "C",
+          "to": "E",
+          "weight": 10
+        },
+        {
+          "from": "D",
+          "to": "E",
+          "weight": 2
+        },
+        {
+          "from": "D",
+          "to": "F",
+          "weight": 6
+        },
+        {
+          "from": "E",
+          "to": "F",
+          "weight": 3
+        }
+      ]
+    },
+    "walkthrough": [
+      {
+        "step": 1,
+        "title": "由小到大排序",
+        "description": "依權重排序：B-C（1）、A-C（2）、D-E（2）、E-F（3）、A-B（4）、B-D（5）……。",
+        "state": "候選順序：1 → 2 → 2 → 3 → 4 → 5 → …"
+      },
+      {
+        "step": 2,
+        "title": "加入 B-C（1）與 A-C（2）",
+        "description": "兩條邊的端點一開始都在不同集合，因此都能加入，並合併對應集合。",
+        "state": "已選：B-C、A-C　｜　目前連通：{A, B, C}"
+      },
+      {
+        "step": 3,
+        "title": "加入 D-E（2）與 E-F（3）",
+        "description": "D-E 與 E-F 的端點也各自位於不同集合，因此接受這兩條邊。",
+        "state": "已選：B-C、A-C、D-E、E-F　｜　連通：{A, B, C}、{D, E, F}"
+      },
+      {
+        "step": 4,
+        "title": "跳過 A-B（4）",
+        "description": "A 和 B 已經透過 A-C-B 連通，若再加入 A-B 就會形成環，因此必須跳過。",
+        "state": "A、B 已在同一集合　｜　A-B 不加入"
+      },
+      {
+        "step": 5,
+        "title": "加入 B-D（5）並完成",
+        "description": "B 與 D 目前屬於不同集合，加入 B-D 後兩個連通集合合併，六個節點全部連通。",
+        "state": "最小生成樹共 5 條邊　｜　總權重：1 + 2 + 2 + 3 + 5 = 13"
+      }
+    ],
+    "result": "最小生成樹包含 B-C（1）、A-C（2）、D-E（2）、E-F（3）、B-D（5），總權重為 13。A-B（4）因為會形成環而被略過。"
+  },
+  "pseudocode": "KRUSKAL(vertices, edges):\n    sort edges by nondecreasing weight\n    initialize DSU with each vertex in its own set\n    mst = empty set\n\n    for each edge (u, v, weight) in sorted edges:\n        if FIND(u) != FIND(v):\n            add edge (u, v, weight) to mst\n            UNION(u, v)\n\n            if size(mst) == |V| - 1:\n                break\n\n    return mst",
+  "complexity": {
+    "time": "O(E log E)",
+    "space": "O(V + E)",
+    "notes": "主要成本是排序 E 條邊，需 O(E log E)；並查集搭配 path compression 與 union by rank/size 時，所有 Find／Union 操作的總成本接近 O(E α(V))，通常由排序主導。額外空間包含邊集合與 DSU；若輸入邊集合不計入額外空間，DSU 本身為 O(V)。"
+  },
+  "pros": [
+    "不需要指定起點，從全圖的邊集合出發即可。",
+    "與並查集搭配後，判斷是否形成環相當有效率。",
+    "若原圖不連通，也能產生最小生成森林。"
+  ],
+  "cons": [
+    "必須先排序所有邊，對邊數非常大的圖會有排序成本。",
+    "需要額外理解並查集的 Find 與 Union 操作。",
+    "對邊資料取得不便、但鄰接關係容易查詢的情境，Prim 可能更自然。"
+  ],
+  "applications": [
+    "網路、道路與電纜等低成本連接規劃。",
+    "以最小連接成本建立骨架網路。",
+    "資料分群與相似度關係的最小生成樹應用。"
+  ],
+  "comparisons": [
+    {
+      "algorithmId": "prim",
+      "description": "Prim 每次從目前生成樹向外擴張，Kruskal 則依全圖邊權重排序，加入不會形成環的邊。稀疏圖常見兩者都有效；實際選擇取決於圖的表示方式與資料取得型態。"
+    }
+  ],
+  "references": [
+    {
+      "title": "CP-Algorithms：Minimum Spanning Tree — Kruskal's Algorithm",
+      "url": "https://cp-algorithms.com/graph/mst_kruskal.html"
+    }
+  ]
+}

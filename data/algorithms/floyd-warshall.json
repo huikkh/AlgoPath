@@ -1,0 +1,126 @@
+{
+  "id": "floyd-warshall",
+  "introduction": "Floyd-Warshall 演算法用來計算加權圖中所有節點配對之間的最短距離（All-Pairs Shortest Paths）。它以距離矩陣表示目前已知的最短距離，並逐一允許每個節點作為中繼點，檢查路徑是否能因此變短。",
+  "coreConcept": "這是一種動態規劃（Dynamic Programming）演算法。令 dist[i][j] 表示目前 i 到 j 的最短距離；當允許 k 作為中繼點時，比較原本的 dist[i][j] 與 dist[i][k] + dist[k][j]，取較小者。外層迴圈必須依序枚舉中繼點 k，才能確保每一階段的子問題都已經計算完成。",
+  "steps": [
+    {
+      "title": "建立初始距離矩陣",
+      "description": "自己到自己的距離設為 0；有直接邊的兩點填入邊權重；沒有直接邊則設為無限大。"
+    },
+    {
+      "title": "選擇中繼節點 k",
+      "description": "依序將每個節點 k 視為目前允許使用的中繼點。"
+    },
+    {
+      "title": "更新每一組點對",
+      "description": "對所有 i、j，比較 dist[i][j] 和 dist[i][k] + dist[k][j]，若經過 k 更短，就更新矩陣。"
+    },
+    {
+      "title": "完成所有中繼節點",
+      "description": "當每個節點都曾作為中繼點後，矩陣便包含所有點對的最短距離。若某個 dist[v][v] 最後小於 0，則存在負權重環。"
+    }
+  ],
+  "example": {
+    "description": "使用 A、B、C、D 四個節點的無向加權圖。初始時 A 到 D 有直接邊，成本為 10；但若允許經過 B、C，可能找到更短的間接路徑。",
+    "graph": {
+      "directed": false,
+      "nodes": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "edges": [
+        {
+          "from": "A",
+          "to": "B",
+          "weight": 3
+        },
+        {
+          "from": "A",
+          "to": "D",
+          "weight": 10
+        },
+        {
+          "from": "B",
+          "to": "C",
+          "weight": 2
+        },
+        {
+          "from": "B",
+          "to": "D",
+          "weight": 7
+        },
+        {
+          "from": "C",
+          "to": "D",
+          "weight": 1
+        }
+      ]
+    },
+    "walkthrough": [
+      {
+        "step": 1,
+        "title": "建立初始矩陣",
+        "description": "先填入自身距離 0 與直接邊權重；沒有直接邊的點對暫時記為 ∞。",
+        "state": "A：[0, 3, ∞, 10]　B：[3, 0, 2, 7]　C：[∞, 2, 0, 1]　D：[10, 7, 1, 0]"
+      },
+      {
+        "step": 2,
+        "title": "允許 B 作為中繼點",
+        "description": "檢查經過 B 是否能縮短距離。A 到 C 可由 A→B→C 到達，距離由 ∞ 更新為 3 + 2 = 5。",
+        "state": "更新：A→C = 5，C→A = 5"
+      },
+      {
+        "step": 3,
+        "title": "允許 C 作為中繼點",
+        "description": "檢查經過 C 的路徑。A 到 D 更新為 5 + 1 = 6；B 到 D 更新為 2 + 1 = 3。",
+        "state": "更新：A→D = 6、B→D = 3（反向距離亦相同）"
+      },
+      {
+        "step": 4,
+        "title": "完成所有點對",
+        "description": "其餘中繼點檢查完成後，得到所有節點對之間的最短距離矩陣。",
+        "state": "A：[0, 3, 5, 6]　B：[3, 0, 2, 3]　C：[5, 2, 0, 1]　D：[6, 3, 1, 0]"
+      }
+    ],
+    "result": "A 到 D 的最短路徑為 A → B → C → D，總權重為 3 + 2 + 1 = 6，比直接邊的 10 更短。最後的矩陣列出所有點對的最短距離。"
+  },
+  "pseudocode": "FLOYD_WARSHALL(dist):\n    for k = 1 to V:\n        for i = 1 to V:\n            for j = 1 to V:\n                if dist[i][k] + dist[k][j] < dist[i][j]:\n                    dist[i][j] = dist[i][k] + dist[k][j]\n\n    for v = 1 to V:\n        if dist[v][v] < 0:\n            report negative cycle\n\n    return dist",
+  "complexity": {
+    "time": "O(V³)",
+    "space": "O(V²)",
+    "notes": "演算法使用三層巢狀迴圈，分別枚舉中繼點、起點與終點，因此時間為 O(V³)。距離矩陣需要 V × V 個元素，空間為 O(V²)。可處理負權重邊，但若圖中存在負權重環，受影響的最短路徑沒有有限解。"
+  },
+  "pros": [
+    "一次即可求出所有節點配對的最短距離。",
+    "程式簡潔，直接使用距離矩陣即可實作。",
+    "允許負權重邊，只要不存在負權重環。"
+  ],
+  "cons": [
+    "時間 O(V³)、空間 O(V²)，不適合節點數非常大的圖。",
+    "即使圖形很稀疏，仍會執行完整的三層迴圈。",
+    "若要還原實際路徑，需額外維護前驅或 next 矩陣。"
+  ],
+  "applications": [
+    "節點數不大、需要查詢任意兩點最短距離的網路。",
+    "城市或交通網路中的全點對距離預先計算。",
+    "傳遞閉包、路徑規劃與動態規劃相關問題。"
+  ],
+  "comparisons": [
+    {
+      "algorithmId": "dijkstra",
+      "description": "Dijkstra 適合非負權重的單一起點查詢；Floyd-Warshall 適合節點數較少、需要所有點對結果的情境。"
+    },
+    {
+      "algorithmId": "bellman-ford",
+      "description": "Bellman-Ford 針對單一起點，能處理負權重；Floyd-Warshall 針對所有點對，也能處理負權重，但兩者都需要留意負權重環。"
+    }
+  ],
+  "references": [
+    {
+      "title": "CP-Algorithms：Floyd–Warshall Algorithm",
+      "url": "https://cp-algorithms.com/graph/all-pair-shortest-path-floyd-warshall.html"
+    }
+  ]
+}
